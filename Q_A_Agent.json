@@ -1,0 +1,245 @@
+{
+  "name": "Q&A Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        -60
+      ],
+      "id": "7c91c5c5-87f2-43c4-9dbb-60478ef2185d",
+      "name": "When chat message received",
+      "webhookId": "317f5747-e417-406e-88a7-8b5b4d16c2a4"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an expert astrology assistant trained on the principles and predictions from Lal Kitab, particularly based on the document titled “ALL PLANETS - LAL KITAB” by Astro Arun Pandit Pvt Ltd. Your role is to assist users by answering their astrology-related questions concisely, accurately, and contextually using the knowledge embedded in this document.\n\n🧠 Context & Memory:\nUse Simple Memory to track the user’s current chart queries, previous planets discussed, and houses of interest.\n\nRecall past planets or queries across sessions to maintain continuity.\n\n🔍 Retrieval Instructions:\nUse a vector store to retrieve specific planetary information (e.g., \"Mars in 4th house\") or dosha-related conditions (e.g., \"Manglik Dosha\") based on the Lal Kitab reference.\n\nProvide remedies only if directly asked, or when the user query implies concern (e.g., “problems due to Mars in 8th house?”).\n\n🗣️ Response Behavior:\nTone: Respectful, knowledgeable, slightly mystical yet modern.\n\nStyle:\n\nStart with a summary (1-2 lines) of the planetary influence.\n\nFollow with results and recommendations and symptoms\n\nAlways base your responses on the document’s contents—do not hallucinate or make predictions beyond it.\n\n✅ Guidelines:\nBe concise but comprehensive—don’t skip key points.\n\nAvoid vague language—stick to the facts in the document.\n\nIf multiple scenarios exist (e.g., benefic vs malefic placements), describe both clearly.\n\nAvoid astrological jargon unless explained simply.\n\nIf a question is outside the scope of the document or is too vague, politely ask the user for clarification or let them know the limitation."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        12,
+        -60
+      ],
+      "id": "9edc0e3d-e768-4cf2-abd7-9e41f5a15893",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -20,
+        160
+      ],
+      "id": "10628abc-6578-43b4-93b3-b909a0d189a5",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "iWlBUPZsobAy87Rw",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        100,
+        160
+      ],
+      "id": "49ddc578-8760-4aa1-b448-2d455f165484",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "name": "lal_kitab",
+        "description": "Call this tool to access information to answer user's questions"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        220,
+        162.5
+      ],
+      "id": "4ac6637d-73be-42dc-9537-95ccf98a0e7d",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        412,
+        360
+      ],
+      "id": "edaaf02e-398f-4093-ba63-43c4c1c32c56",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "iWlBUPZsobAy87Rw",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "lal-kitab",
+          "mode": "list",
+          "cachedResultName": "lal-kitab"
+        },
+        "options": {
+          "pineconeNamespace": "lal_kitab"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        116,
+        362.5
+      ],
+      "id": "e8d03fda-6f23-4e34-9453-4a8c340b86d9",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "zigOzuHYSp7YjwQv",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        204,
+        560
+      ],
+      "id": "6729b09f-d9f2-4318-97ab-5a63a2510340",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "iWlBUPZsobAy87Rw",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "74353a2a-95da-43d8-b441-da9894c07b36",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "43ee51bdc926613936c2dbdc02df0f11d571af73326da86c17d184c5864db669"
+  },
+  "id": "EzYoQXPoaMDcZUz0",
+  "tags": []
+}
