@@ -1,0 +1,383 @@
+{
+  "name": "Email",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {}
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "30e81b21-b74d-47dc-8e1e-cb16a1c81ec4",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VOYTDdWcvjRUliHy",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "High Priority",
+              "description": "Emails requiring immediate attention or action, typically from clients or colleagues. These generally include time sensitive requests, escalated issues or deadlines. Keywords- High Priority, ASAP, deadline, action required, immediate."
+            },
+            {
+              "category": "Promotions",
+              "description": "Emails related to marketing campaigns, promotional offers, newsletters or events. They generally try to sell you something or the other. Keywords- Sign Up, Register, Limited period Offer, Redeem now, special offer, last chance."
+            },
+            {
+              "category": "Invoice/Bill",
+              "description": "Emails in which we receive type of an Invoice or a bill, like credit card statement, Bank statement, Amazon shopping Bill"
+            },
+            {
+              "category": "Transaction Alert",
+              "description": "Emails in which we receive an alert for some financial transaction like credit card transaction alert and Bank transaction alert."
+            },
+            {
+              "category": "Others",
+              "description": "All other emails"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "c791dcc1-16de-4e19-a467-d306d487e51a",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        140,
+        160
+      ],
+      "id": "806d8602-acc2-4941-8e96-4227e2d43484",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "iWlBUPZsobAy87Rw",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "IMPORTANT"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        -300
+      ],
+      "id": "33aab4b6-5786-41d0-9a9e-ff64f9773e38",
+      "name": "High Priority",
+      "webhookId": "f00e30ca-3855-4b22-9215-f3507c7a8b06",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VOYTDdWcvjRUliHy",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "CATEGORY_PROMOTIONS"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        -100
+      ],
+      "id": "5dd53e2c-d7c2-492b-9b90-1cbc5d2b10ed",
+      "name": "Promotions",
+      "webhookId": "f00e30ca-3855-4b22-9215-f3507c7a8b06",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VOYTDdWcvjRUliHy",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": "={{ [\"Invoice/bill\"] }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        100
+      ],
+      "id": "4370b3e0-e391-4287-bb60-be912827700d",
+      "name": "Invoice/Bill",
+      "webhookId": "f00e30ca-3855-4b22-9215-f3507c7a8b06",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VOYTDdWcvjRUliHy",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": "={{ [\"Transaction Alert\"] }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        300
+      ],
+      "id": "6439d008-cde3-4b78-b062-e1f533c00c3e",
+      "name": "Transaction Alert",
+      "webhookId": "f00e30ca-3855-4b22-9215-f3507c7a8b06",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VOYTDdWcvjRUliHy",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        940,
+        -300
+      ],
+      "id": "a94f3a03-3872-446d-b3a0-1dbbf0a0e156",
+      "name": "Create Draft",
+      "credentials": {
+        "openAiApi": {
+          "id": "iWlBUPZsobAy87Rw",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "hu",
+        "message": "hi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1300,
+        -300
+      ],
+      "id": "dcf39100-8f48-48aa-977d-d2d5cda40ec1",
+      "name": "Gmail",
+      "webhookId": "49101294-b45a-4178-838d-ae5337239e48",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VOYTDdWcvjRUliHy",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1520,
+        -300
+      ],
+      "id": "f43d5cf5-1651-45a0-a2a5-7ab1b48cfab8",
+      "name": "Telegram",
+      "webhookId": "e549623d-b8df-463f-88a4-303d13a1cc68"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": "={{ [\"Transaction Alert\"] }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        500
+      ],
+      "id": "56520db6-ee90-4611-bb52-9726af4c92ed",
+      "name": "Transaction Alert1",
+      "webhookId": "f00e30ca-3855-4b22-9215-f3507c7a8b06",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VOYTDdWcvjRUliHy",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "High Priority",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Promotions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invoice/Bill",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transaction Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transaction Alert1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Priority": {
+      "main": [
+        [
+          {
+            "node": "Create Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Draft": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0ea440ca-8fa8-4423-ba25-33b88d154fc0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "43ee51bdc926613936c2dbdc02df0f11d571af73326da86c17d184c5864db669"
+  },
+  "id": "3YzB9l2O1Kg3YIrI",
+  "tags": []
+}
