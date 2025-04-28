@@ -1,0 +1,243 @@
+{
+  "name": "LinkedIn",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        120
+      ],
+      "id": "69f36a2e-78b5-4bd6-bb70-1c1867d26f4f",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1KUUOD7FkDhY1oytGZJA7K-huagWAD6gfV30SfaZ6fJE",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KUUOD7FkDhY1oytGZJA7K-huagWAD6gfV30SfaZ6fJE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KUUOD7FkDhY1oytGZJA7K-huagWAD6gfV30SfaZ6fJE/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "To Do"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        180,
+        120
+      ],
+      "id": "0b0e5ade-2bca-4b79-bbc3-71d247284890",
+      "name": "Get Topic",
+      "credentials": {
+        "googleApi": {
+          "id": "jJduenhQK7qpRk2h",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"Search the web for {{ $json.Topic }}\",\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 3,\n  \"time_range\": null,\n  \"days\": 7,\n  \"include_answer\": true,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": []\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        120
+      ],
+      "id": "e8cb015e-aade-4cf6-8919-e3fbe8a0785a",
+      "name": "Tavily"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1KUUOD7FkDhY1oytGZJA7K-huagWAD6gfV30SfaZ6fJE",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KUUOD7FkDhY1oytGZJA7K-huagWAD6gfV30SfaZ6fJE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KUUOD7FkDhY1oytGZJA7K-huagWAD6gfV30SfaZ6fJE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ $('Get Topic').item.json.Topic }}",
+            "Status": "Created",
+            "Content": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "Topic"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        980,
+        120
+      ],
+      "id": "0487902b-0c78-4794-9448-325fb4ad05af",
+      "name": "Send Content"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Article 1: {{ $json.results[0].content }}\nArticle 2: {{ $json.results[1].content }}\nArticle 3: {{ $json.results[2].content }}",
+        "options": {
+          "systemMessage": "=# Overview  \nYou are an AI agent responsible for generating a concise, inspiring LinkedIn post targeted at entrepreneurs, based on the content of three given articles.  \n\n## Context  \n- The agent receives 3 articles on a related topic.  \n- The goal is to synthesize the key ideas into a short, professional LinkedIn post.  \n- The tone should be motivational, forward-thinking, and relevant to the entrepreneurial mindset.  \n- Posts should be optimized for engagement using relevant hashtags and light use of emojis.  \n\n## Instructions  \n1. Read and extract the core themes, trends, or insights from all three articles.  \n2. Identify any common threads or overarching message.  \n3. Write a LinkedIn post (max 700 characters) that blends the main insights into a unified, inspiring message.  \n4. Use 2–4 relevant hashtags that align with the post topic and entrepreneur interests.  \n5. Add 1–3 tasteful emojis to increase engagement without reducing professionalism.  \n6. Do not quote or directly reference article sources. Focus on synthesizing ideas.  \n\n\n## Examples  \n- Input: 3 articles on AI in startups, bootstrapping, and the rise of solopreneurs.  \n- Output:  \n  \"From AI copilots to lean bootstrapping, the age of the solopreneur is now. 🚀  \n  Entrepreneurs are rewriting the rules—scaling smarter, faster, and with less.  \n  Embrace the shift. The tools are here. The future is solo-powered.  \n  #Entrepreneurship #AI #Bootstrapping #FutureOfWork\"\n\n## SOP (Standard Operating Procedure)  \n1. Receive the 3 articles and briefly scan each to extract top insights.  \n2. Group overlapping ideas into 1–2 core messages.  \n3. Draft a LinkedIn post with a motivating tone, keeping under the character limit.  \n4. Add emojis and hashtags appropriately.  \n5. Review for clarity, grammar, and impact.  \n\n## Final Notes  \n- Posts must always be original and never copy from the source articles.  \n- Avoid technical jargon or overly niche terms—keep it accessible.  \n- Prioritize clarity, brevity, and emotional resonance.  \n---\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        620,
+        120
+      ],
+      "id": "bf77e898-a03f-4e72-8633-0fd42001c8a1",
+      "name": "Content Creator"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Topic": {
+      "main": [
+        [
+          {
+            "node": "Tavily",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily": {
+      "main": [
+        [
+          {
+            "node": "Content Creator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Creator": {
+      "main": [
+        [
+          {
+            "node": "Send Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "224b2d44-6fe1-4e28-b2cf-bdd92d14e89d",
+  "meta": {
+    "instanceId": "43ee51bdc926613936c2dbdc02df0f11d571af73326da86c17d184c5864db669"
+  },
+  "id": "QD3gnJaFjH8MULSy",
+  "tags": []
+}
